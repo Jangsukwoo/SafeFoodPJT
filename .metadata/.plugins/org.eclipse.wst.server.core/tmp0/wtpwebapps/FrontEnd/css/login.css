@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+#loginBox{
+    width : 450px;
+    position: relative;
+    left: 40%;
+    top: 100px;
+}

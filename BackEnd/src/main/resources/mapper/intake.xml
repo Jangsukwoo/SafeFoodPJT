@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="intake"> 
+	
+	<insert id="insertIntakeInfo" parameterType="com.ssafy.edu.vue.dto.IntakeInfoDto">
+		insert into intakeinfo (fno,id,date,quantity) values(#{fno},#{id},curdate(),#{quantity})
+	</insert>
+	<select id="getIntakeData" parameterType="com.ssafy.edu.vue.dto.IntakeInfoDto" resultType="com.ssafy.edu.vue.dto.IntakeDataDto">
+	select sum(calory*quantity) as calory ,sum(carbo*quantity) as carbo,sum(protein*quantity) as protein,sum(fat*quantity) as fat ,sum(sugar*quantity) as sugar,sum(natrium*quantity) as natrium, sum(chole*quantity) as chole, sum(fattyacid*quantity) as fattyacid, sum(transfat*quantity) as transfat
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{date} and i.fno = f.fno;
+	</select> 
+	
+	<select id="intake.getIntakeFoodlist" parameterType="com.ssafy.edu.vue.dto.IntakeInfoDto" resultType="com.ssafy.edu.vue.dto.IntakeFoodDto">
+		select f.imagepath, f.fname,sum(i.quantity) as intakequantity,sum(i.quantity*f.calory) as calory from intakeinfo i join food f on i.id = #{id} and i.date = #{date} and i.fno = f.fno group by f.fno order by calory desc;
+	</select>
+	
+	<select id="intake.getBestFoodList" resultType="com.ssafy.edu.vue.dto.BestFoodDto">
+	select f.imagePath as img,f.fname as fname,sum(i.quantity) as quantity from intakeinfo i join food f on i.fno = f.fno group by fname order by quantity desc;
+	</select>
+	
+	
+	
+	<select id="getweek" resultType="com.ssafy.edu.vue.dto.IntakeWeekDataDto">
+	  SELECT 
+	DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-1) DAY), '%Y/%m/%d') as sunday,
+  	DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-2) DAY), '%Y/%m/%d') as monday,
+    DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-3) DAY), '%Y/%m/%d') as tuesday,
+    DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-4) DAY), '%Y/%m/%d') as wednesday,
+    DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-5) DAY), '%Y/%m/%d') as thursday,
+    DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-6) DAY), '%Y/%m/%d') as friday,
+    DATE_FORMAT(DATE_SUB(curdate(), INTERVAL (DAYOFWEEK(curdate())-7) DAY), '%Y/%m/%d') as saturday
+  FROM Weekinfo;
+  
+  
+	</select>
+	<update id="updateday">
+	  update weekinfo set today = curdate();
+	</update>
+	
+	
+	<select id ="getTodayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = curdate() and i.fno = f.fno;
+	</select>
+	
+	<select id="getSundayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{sunday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getMondayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{monday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getTuesdayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{tuesday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getWednesdayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{wednesday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getThursdayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{thursday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getFridayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{friday} and i.fno = f.fno;
+	</select>
+	
+	<select id="getSaturdayCalory" parameterType="com.ssafy.edu.vue.dto.IntakeWeekDataDto" resultType="String">
+	select sum(calory*quantity) as calory
+	from intakeinfo i join food f on i.id = #{id} and i.date = #{saturday} and i.fno = f.fno;
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="notice">
+ 	<select id="entireList" resultType="com.ssafy.edu.vue.dto.NoticeDto">
+		select qno, title, writer, date from QnA;
+	</select>
+	
+		<insert id="insertNotice" parameterType="com.ssafy.edu.vue.dto.NoticeDto">
+		insert into notice into notice (title,content,date,id) values(#{title}, #{content},curdate(),#{id})
+	</insert>
+	
+	<select id="getNotice" parameterType="java.lang.Integer" resultType="com.ssafy.edu.vue.dto.NoticeDto">
+		select nno AS noticeNO,title,content,date AS time,id from notice where nno=#{noticeNO}
+	</select>
+		
+	<update id="updateNotice" parameterType="com.ssafy.edu.vue.dto.NoticeDto">
+	update member set  title = #{title},content = #{content}, date = curdate() where nno=#{noticeNO}
+	</update>
+	
+	<delete id="deleteNotice" parameterType="java.lang.Integer">
+	delete from notice where nno=#{noticeNO}
+	</delete>
+
+</mapper>

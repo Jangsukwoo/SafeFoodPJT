@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+.navBT{ float: right; }
+
+#emptySection{
+    position : static;
+}
+
+footer {
+    position: relative;
+    top : 500px;
+    color : #aaa;
+    padding-bottom: 15px;
+    padding-top: 5px;
+    padding-left: 20px;
+}
+
+footer h3{
+    margin-top: 10px;
+}

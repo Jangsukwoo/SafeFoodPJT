@@ -1,0 +1,60 @@
+@charset "UTF-8";
+
+#title{
+    margin-top: 70px;
+    margin-bottom: 90px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid gray;
+}
+
+#intake{
+    margin-top: 70px;
+    padding-top: 50px;
+    border-top: 1px solid gray;
+}
+
+#intakeTitle{
+    margin-bottom: 30px;
+}
+
+#date{
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    left: 40%;
+}
+
+.calInfo{
+    font-size: 20px;
+}
+
+.listimg{
+    width: 100px;
+    height: 100px;
+}
+
+.listbt{
+    position: relative;
+    left : 40%;
+    margin-top : 30px;
+    margin-bottom : 30px;
+}
+
+.mcal{
+    color : red;
+}
+
+.lcal{
+    color : blue;
+}
+
+.cinfo{
+    margin-top : 30px;
+    margin-bottom : 30px;
+}
+
+.fbt{
+    position : relative;
+    left : 45%;
+    margin-top : 30px;
+}

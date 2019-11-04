@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="food"> 
+	<select id="AllFood" resultType="com.ssafy.edu.vue.dto.FoodDto">
+		select fno as code, fname as name, maker, imagePath as img, supportpereat, calory, carbo, protein, fat, sugar, natrium, chole,
+		fattyacid, transfat from food
+	</select>
+	<select id="search" resultType="com.ssafy.edu.vue.dto.FoodDto">
+		select fno as code, fname as name, maker, imagePath as img, supportpereat, calory, carbo, protein, fat, sugar, natrium, chole,
+		fattyacid, transfat from food where fname like CONCAT('%',#{name},'%')
+	</select>
+	<select id="getMetrial" resultType="String">
+		select rname from raw r, foodrawinfo f
+		where f.fno = #{fno} and r.rno = f.rno
+	</select>
+	
+	
+	<select id="getRno1" parameterType="java.lang.Integer" resultType="String">
+		select rno from foodrawinfo where fno= #{fno} 
+	</select>
+	
+		
+	<select id="getRno2" parameterType="String" resultType="String">
+		select rno from memberallergyinfo where id= #{id} 
+	</select>
+	
+	<select id="getRname" parameterType="String" resultType="String">
+		select rname from raw where rno = #{rno} 
+	</select>
+	
+	<select id="getFood" parameterType="java.lang.Integer" resultType="com.ssafy.edu.vue.dto.FoodDto">
+		select fno as code, fname as name, maker, imagePath as img, supportpereat, calory, carbo, protein, fat, sugar, natrium, chole,
+		fattyacid, transfat from food where fno = #{fno};
+	</select>
+	
+	<select id="getSafeFoodlist" parameterType="String" resultType="com.ssafy.edu.vue.dto.FoodDto">
+		select distinct fno as code, fname as name, maker, imagePath as img, supportpereat, calory, carbo, protein, fat, sugar, natrium, chole, fattyacid, transfat
+		from food where fno not in (
+		select f.fno from food f join foodrawinfo fr on f.fno = fr.fno
+		where fr.rno in (
+		select m.rno from memberallergyinfo m where id=#{id})
+		)
+	</select>
+	
+</mapper>

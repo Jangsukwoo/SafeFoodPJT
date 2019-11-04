@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ssafy.edu.vue.dao.HrmMapper">
+ <select id="findAllEmployees" resultType="com.ssafy.edu.vue.dto.EmployeeDto">
+	select id, name, mailid, start_date, manager_id, title, dept_id    ,                      
+	ifnull(salary,0.0) salary, ifnull(commission_pct,0.0) commission_pct                                        
+	from s_emp order by id       
+ </select>
+  <select id="findEmployeeById" parameterType="java.lang.Integer" resultType="com.ssafy.edu.vue.dto.EmployeeDto">
+	select id, name, mailid, start_date, manager_id, title, dept_id    ,                      
+	ifnull(salary,0.0) salary, ifnull(commission_pct,0.0) commission_pct                                        
+	from s_emp where id= #{id}   
+ </select>
+  <select id="findAllTitles" resultType="com.ssafy.edu.vue.dto.EmployeeDto">
+	select distinct title from s_emp      
+ </select>
+  <select id="getEmployeesTotal" resultType="java.lang.Integer">
+    	SELECT COUNT(*) FROM s_emp
+    </select>
+     <select id="findLikeEmployees" parameterType="java.lang.String" resultType="com.ssafy.edu.vue.dto.EmployeeDto" >
+	select id, name, mailid, start_date, manager_id, title, dept_id    ,                      
+	ifnull(salary,0.0) salary, ifnull(commission_pct,0.0) commission_pct                                        
+	from s_emp where name like  concat('%',#{name},'%')  
+ </select>
+     <insert id="addEmployee" parameterType="com.ssafy.edu.vue.dto.EmployeeDto" >
+    		INSERT INTO s_emp	     
+			(name, mailid, start_date, manager_id, title, dept_id, SALARY, COMMISSION_PCT)
+			VALUES(#{name},#{mailid},#{start_date},
+			<if test="manager_id != '' and manager_id != null and  manager_id != 0 " >
+				#{manager_id}
+			</if>       		
+			<if test="manager_id == '' or manager_id == null or manager_id == 0 " >
+				null
+			</if>  
+            ,#{title},#{dept_id},#{salary},
+			<if test="commission_pct != '' and commission_pct != null and  commission_pct != 0 " >
+				#{commission_pct}
+			</if>       		
+			<if test="commission_pct == '' or commission_pct == null or commission_pct == 0 " >
+				null
+			</if>  
+	        )
+    </insert>
+    <update id="updateEmployee" parameterType="com.ssafy.edu.vue.dto.EmployeeDto">
+    	UPDATE s_emp   SET                      
+	        title=#{title},                                  
+	        dept_id=#{dept_id} 
+	        WHERE id=#{id}                
+    </update>
+    <delete id="deleteEmployee" parameterType="java.lang.Integer">
+        DELETE   FROM   s_emp     WHERE id=#{id}    
+    </delete>
+     <select id="findAllDepartments" resultType="com.ssafy.edu.vue.dto.DepartmentDto">
+	select dept_id, name, region_id from s_dept              
+ </select>
+  <select id="findAfterAdd"  resultType="java.lang.Integer">
+	   		SELECT MAX(id)  FROM s_emp            
+    </select>
+
+</mapper>
+<!-- private int id;
+	private String name;
+	private String mailid;
+	private String start_date;
+	private int manager_id;
+	private String title;
+	private int dept_id;
+	private double salary;
+	private double commission_pct=0.0; -->

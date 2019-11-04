@@ -1,0 +1,18 @@
+@charset "UTF-8";
+
+.sbox{padding-left: 35%}
+#searchbar {color: #aaa;}
+#searchbar li{
+    float: left;
+    padding : 3px; 
+    position: relative; 
+    margin : 5px;
+}
+
+
+img{width:180px; height:180px;}
+
+#foodImage{margin-top:10px; float:left; width:25%; cursor:pointer;}
+#foodInfo{float:right; width:75%;}
+.foodList {border:2px solid lightgray; margin:5px; height:300px; width:49%; float:left; min-width:800px;}
+

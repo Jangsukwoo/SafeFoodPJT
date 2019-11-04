@@ -1,0 +1,34 @@
+@charset "UTF-8";
+
+.listbox{
+    position: relative;
+    width: 1000px;
+    left: 25%;
+}
+
+.addbox{
+    position: relative;
+    width: 700px;
+    left: 30%;
+}
+
+.viewbox{
+    position: relative;
+    width: 1000px;
+    left: 25%;
+}
+
+.title{
+    margin-top: 60px;
+}
+
+.btbt{
+    position: relative;
+    margin-top : 90px;
+    margin-bottom : 30px;
+    left: 40%;
+}
+
+#formbox{
+    margin-top: 50px;
+}

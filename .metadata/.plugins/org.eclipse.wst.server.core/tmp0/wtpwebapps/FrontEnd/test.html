@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<h1>QnA</h1>
+		<table>
+			<tr>
+				<th>번호</th>
+				<th>제목</th>
+				<th>작성자</th>
+				<th>작성일</th>
+				<th> - </th>
+			</tr>
+			
+			<tr v-for="QnA in info">
+				<td v-html="QnA.qno"></td>
+				<td v-html="QnA.title" @click="showDetail(QnA.qno)"></td>
+				<td v-html="QnA.writer"></td>
+				<td v-html="QnA.date"></td>
+				<td><button @click="deleteQnA(QnA.qno)">삭제</button></td>
+			</tr>
+			
+		</table>
+		<button @click="flag = 1">QnA등록</button>
+		
+		<div v-if="flag == 1">
+			<h1>QnA등록</h1>
+			<form action="" method="post" id="_frmForm" name="frmForm" @submit.prevent="AddQnA">
+				제목 : <input type="text" name="title" v-model="ctitle"> <br>
+				내용 : <textarea rows="10" cols="30" name="content" v-model="ccontent"></textarea> <br>
+				<button type="submit">등록</button>
+			</form>
+		</div>
+		
+		<div v-if="flag == 2">
+			<h1>QnA정보</h1>
+			글번호 : <span v-html="cqna.qno"></span> <br>
+			제목 : <span v-html="cqna.title"></span> <br>
+			내용 : <span v-html="cqna.content"></span> <br>
+			작성자 : <span v-html="cqna.writer"></span> <br>
+			작성일 : <span v-html="cqna.date"></span> <br>
+			
+			<button @click="flag = 0">목록으로 돌아가기</button>
+		</div>
+		
+		
+		
+		
+	</div>
+	
+	
+	<script type="text/javascript">
+		new Vue({
+			el:'#app',
+			data (){
+				return{
+					info: [],
+					flag : '',
+					ctitle : '',
+					ccontent : '',
+					cqna : {}
+				}
+			},
+			methods:{
+				AddQnA : function(){
+					if(this.ctitle==''){ alert('제목을 입력하세요.'); return ;}
+			 		if(this.ccontent==''){ alert('내용을 입력하세요.'); return ;}
+
+					  axios.post('http://localhost:8197/ssafyvue/api/AddQnA', {
+						  qno : null,
+				    	  title : this.ctitle,
+				    	  content : this.ccontent,
+						  writer : "admin",
+						  date : null
+				    	} 
+				      ).then(function(response){
+				    	  if(response.data.state=='succ'){
+				    		  alert(response.data.name+"이 실행되었습니다.");
+				    		  flag = 0;
+				    		  location.href='./QnAList.html';
+				    	  }else{
+				    		  alert(response.data.name+"에 실패하였습니다.");
+				    	  	  flag = 1;
+				    		  location.href='./QnAList.html';
+				    	  }
+				      })
+				},
+				showDetail :function(qno){
+					this.flag = 2;
+					axios
+				      .get('http://localhost:8197/ssafyvue/api/findQnAByQno/'+qno)
+				      .then(response => (this.cqna = response.data))
+				},
+				deleteQnA : function(qno){
+					axios
+				      .get('http://localhost:8197/ssafyvue/api/deleteQnA/'+qno)
+				      .then(function(response){ 
+				    	  flag = 0;
+				    	  location.href='./QnAList.html';
+				      })
+				}
+			},
+			mounted(){
+				axios
+					.get('http://localhost:8197/ssafyvue/api/getQnAList')
+					.then(response => (this.info = response.data))
+			}
+		});
+	</script>
+</body>
+</html>

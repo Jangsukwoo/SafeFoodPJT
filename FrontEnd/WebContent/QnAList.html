@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<link href="./css/QnAList.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+		</header>
+		
+		<div>
+			<div v-if="flag == 0" class="listbox">
+				<div class="title"><h1>QnA</h1></div>
+				<table class="table table-hover">
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>작성자</th>
+						<th>작성일</th>
+						<th>answer</th>
+					</tr>
+					
+					<tr v-for="QnA in info">
+						<td v-html="QnA.qno"></td>
+						<td v-html="QnA.title" @click="showDetail(QnA.qno)"></td>
+						<td v-html="QnA.writer"></td>
+						<td v-html="QnA.date"></td>
+						<td v-if="QnA.answerflag">답변완료</td>
+						<td v-else>-</td>
+					</tr>
+					
+				</table>
+				<div class ="btbt"><button @click="flag = 1" class="btn btn-primary">QnA등록</button></div>
+			</div>
+			
+			<div v-if="flag == 1" class="addbox">
+				<div class="title"><h1>QnA등록</h1></div>
+				<form id="formbox" class="form-horizontal" action="" method="post" id="_frmForm" name="frmForm" @submit.prevent="AddQnA">
+					<div class="form-group">
+	                    <label class="col-sm-2 control-label">제목</label>
+	                    <div class="col-sm-10">
+	                    	<input type="text" name="title" v-model="ctitle" class="form-control" placeholder="title">
+	                    </div>
+                	</div>
+                	<div class="form-group">
+	                    <label class="col-sm-2 control-label">내용</label>
+	                    <div class="col-sm-10">
+	                    	<textarea rows="20" cols="80" name="content" v-model="ccontent"></textarea>
+	                    </div>
+                	</div>
+                	<div class="btbt">
+						<button type="submit" class="btn btn-primary">등록</button>
+						<button @click="flag = 0" class="btn btn-danger">cancle</button>	                	
+                	</div>
+				</form>
+			</div>
+			
+			<div v-if="flag == 2" class="viewbox">
+				<div class="title"><h1>QnA정보</h1></div>
+				<table class="table">
+					<tr>
+						<td>글번호</td>
+						<td v-html="cqna.qno"></td>
+					</tr>
+					<tr>
+						<td>제목</td>
+						<td v-html="cqna.title"></td>
+					</tr>
+					<tr>
+						<td>내용</td>
+						<td v-html="cqna.content"></td>
+					</tr>
+					<tr>
+						<td>작성자</td>
+						<td v-html="cqna.writer"></td>
+					</tr>
+					<tr>
+						<td>작성일</td>
+						<td v-html="cqna.date"></td>
+					</tr>
+					<tr v-if="cqna.answerflag">
+						<td>답변</td>
+						<td v-html="cqna.answer"></td>
+					</tr>
+				</table>
+				
+				<div v-if="fflag == 3">
+					<form class="form-horizontal" action="" method="POST" @submit.prevent="addAnswer(cqna.qno)">
+							<div class="form-group">
+		                    <label class="col-sm-2 control-label">내용</label>
+		                    <div class="col-sm-10">
+		                    	<textarea rows="20" cols="80" v-model="answer"></textarea>
+		                    </div>
+		                    <div class="btbt">
+			                    <button type="submit" class="btn btn-primary">등록</button>
+		                    </div>
+	                	</div>
+					</form>
+				</div>	
+				
+				<div class="btbt">
+					<button @click="flag = 0" class="btn btn-primary">목록</button>
+					<button v-if="loginOK=='admin'" @click="fflag = 3" class="btn btn-danger">답변달기</button>
+				</div>
+			</div>
+			
+			
+				
+		</div>
+
+		<div class="emptySection">
+		<footer class="navbar-inverse">
+			<h3>Find Us</h3>
+			<ul class="nav">
+				<li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+				<li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+				<li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+			</ul>
+		</footer>
+		</div>
+	</div>
+	
+	
+	<script type="text/javascript">
+		new Vue({
+			el:'#app',
+			data (){
+				return{
+					loginOK : '',
+					mgr : false,
+					key : '',
+					foods:[],
+					info: [],
+					flag : '0',
+					ctitle : '',
+					ccontent : '',
+					cqna : {},
+					fflag : '',
+					answer : '',
+					serverURL : "http://08416c4a.ngrok.io"
+				}
+			},
+			methods: {
+				logout : function(){
+		               localStorage.removeItem('sessionInfo');
+		               this.loginOK = '';
+		               this.mgr = false;
+		               location.href="./index.html"
+		        },
+		        foodViewAction : function(fcode){
+		        	location.href="foodView.html?code=" + fcode;
+		        },
+		        AddQnA : function(){
+					if(this.ctitle==''){ alert('제목을 입력하세요.'); return ;}
+			 		if(this.ccontent==''){ alert('내용을 입력하세요.'); return ;}
+
+					  axios.post(this.serverURL + '/ssafyvue/api/AddQnA', {
+						  qno : null,
+				    	  title : this.ctitle,
+				    	  content : this.ccontent,
+						  writer : "admin",
+						  date : null
+				    	} 
+				      ).then(function(response){
+				    	  if(response.data.state=='succ'){
+				    		  alert("insert Success");
+				    		  flag = 0;
+				    		  location.href='./QnAList.html';
+				    	  }else{
+				    		  alert("Insert fail");
+				    	  	  flag = 1;
+				    		  location.href='./QnAList.html';
+				    	  }
+				      })
+				},
+				showDetail :function(qno){
+					this.flag = 2;
+					axios
+				      .get(this.serverURL + '/ssafyvue/api/getQnA/'+qno)
+				      .then(response => (this.cqna = response.data))
+				},
+				deleteQnA : function(qno){
+					axios
+				      .get(this.serverURL + '/ssafyvue/api/deleteQnA/'+qno)
+				      .then(function(response){ 
+				    	  flag = 0;
+				    	  location.href='./QnAList.html';
+				      })
+				},
+				addAnswer : function(qno){
+					if(this.answer == '') {alert("check answer"); return;}
+					
+					axios.post(this.serverURL + '/ssafyvue/api/AddAnswer', {
+	                   	qno : qno,
+	                   	answer : this.answer
+	                }).then(function(response){
+	                    if(response.data.state=='succ'){
+	                        alert('answer Success');
+	                        location.href="./QnAList.html";
+	                    }
+	                    else{
+	                        alert('answer fail');
+	                    }
+	                })
+				}
+			},
+			mounted(){
+				if(localStorage.getItem('sessionInfo') != null){
+	                this.loginOK = localStorage.getItem('sessionInfo');
+	            }
+				
+				axios
+				.get(this.serverURL + '/ssafyvue/api/getQnAList')
+				.then(response => (this.info = response.data))
+			}
+		});
+	
+	</script>
+</body>
+</html>

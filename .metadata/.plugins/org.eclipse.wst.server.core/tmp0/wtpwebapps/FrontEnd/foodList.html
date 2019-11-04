@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/index.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+</head>
+<body>
+	<div id="app">
+		<!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+		</header>
+		
+		<!-- body -->
+		<div class="jumbotron">
+			<div class="container-fluid pager">
+				<h1>WHAT WE PROVIDE</h1>
+				건강한 삶을 위한 먹거리 프로젝트
+			</div>
+		</div>
+		 
+		<div id="searchbar" class="navbar-inverse">
+			<div class="sbox">
+				<ul class="nav">
+					<li>검색 조건</li>
+					<li>
+						<select id="searchby">
+							<option>상품명</option>
+						</select>
+					</li>
+					<li>검색 단어</li>
+					<li><input type="text" v-model="key" /></li>
+					<li>
+						<button class="btn btn-primary" id="searchButton" @click="searchFood">
+						<span class="glyphicon glyphicon-search"></span> 검색 </button>
+					</li>
+				</ul>			
+			</div>
+		</div>
+
+		<div id="foodSection" class="row">
+			<div v-for="food in foods">
+				<div class="col-md-6 foodList">
+					<div id="foodImage" class="col-md-2"> <a href="#"><img v-bind:src="food.img"></img></a></div>
+					<div id="foodInfo" class="col-md-3"><div><h4><a @click="foodViewAction(food.code)" v-html="food.name"></a></h4></div>
+					<div v-html="food.maker"></div>
+					<div>
+                        <span v-for="material in food.materialList">
+                        <span v-html="material"></span>
+                    </span>
+					</div>
+					<a href="#"><button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span>추가</button></a>
+				<button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-heart-empty"></span>찜</button>
+				</div>
+			</div>
+		</div>
+        </div>
+            
+        <footer class="navbar-inverse">
+            <h3>Find Us</h3>
+            <ul class="nav">
+                <li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+                <li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+                <li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+            </ul>
+        </footer>
+	</div>
+
+
+
+	<!-- vue -->
+	<script>
+	new Vue({
+		el:'#app',
+		data (){
+			return{
+				loginOK : '',
+				mgr : false,
+				key : '',
+				foods:[],
+				serverURL : "http://08416c4a.ngrok.io"
+			}
+		},
+		methods: {
+			searchFood : function(){
+				axios
+					.get(this.serverURL + '/ssafyvue/api/findLikeFoods/'+this.key)
+					.then(response => (this.foods = response.data))
+					
+			},
+			logout : function(){
+	               localStorage.removeItem('sessionInfo');
+	               this.loginOK = '';
+	               this.mgr = false;
+	               location.href="./index.html"
+	        },
+		    foodViewAction : function(fcode){
+		    	location.href="foodView.html?code=" + fcode;
+	        }
+		},
+		mounted(){
+			console.log("testse")
+			if(localStorage.getItem('sessionInfo') != null){
+                this.loginOK = localStorage.getItem('sessionInfo');
+            }
+			
+             axios
+                .get(this.serverURL + '/ssafyvue/api/getFoodList')
+                .then(response => (this.foods = response.data))
+		    }
+	});
+	</script>
+</body>
+</html>

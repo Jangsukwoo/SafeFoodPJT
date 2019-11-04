@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SafeFood</title>
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<link href="./css/foodView.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="./js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">이 식품은 알러지 성분이 있습니다!</h4>
+                    </div>
+                    <div v-if="aflag == true" class="modal-body">
+                            <div v-show="nflag"><h2>그래도 드시겠습니까..?</h2></div>
+                            <div v-show="!nflag">
+                                <div><h2>알러지 없는 식품!</h2></div>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Calory</th>
+                                    </tr>
+                                    <tr v-for="food in noneallergyfoods">
+                                        <td><img  v-bind:src="food.img" class="listimg" width="100px" height="100px"></></td>
+                                        <td v-html="food.name"></td>
+                                        <td v-html="food.calory"></td>
+                                    </tr>
+                                    
+                                </table>
+
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                         <button @click="addFood2(food.code)" type="button" class="btn btn-default" data-dismiss="modal">추가</button>
+                         <button @click="getNoneAllergy" type="vutton" class="btn btn-primary">알러지 없는 식품 찾기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+		</header>
+
+        <div class="container">
+                <div><h1>제품정보</h1></div>
+                <div id = "foodSection" class="pager">
+                    <div>
+                        <div class="foodImage"><img id="foodImage" v-bind:src="food.img"/></div>
+                        <div class = "foodInfo">
+                            <div><span class="title">제품명</span><span id="foodName" v-html="food.name"></span></div>
+                            <hr>
+                            <div><span class="title">제조사</span><span id="foodMaker" v-html="food.maker"></span></div>
+                            <hr>
+                            <div><span class="title2">원재료</span>
+                                <span id="foodMaterial" v-for="material in food.noneallergyList">
+							        <span v-html="material"></span>
+                                </span>
+                            </div>
+                            <hr>
+                            <div v-if="loginOK != '' "><span class="title2">식품에 포함된 알러지 성분</span>
+                                <span id="allergy" v-for="material in food.allergyList">
+							        <span v-html="material"></span>
+                                </span>
+                            </div>
+                            <hr>
+                            <span class="title">Quantity</span><input type="number" v-model="quantity" id="quantity"/>
+                            <button @click="addFood(food.code)" class="btn btn-primary btn-sm" id="addButton"><span class="glyphicon glyphicon-plus"></span>추가</button>
+                            <button class = "btn btn-primary btn-sm"><span class="glyphicon glyphicon-heart-empty"></span>찜</button>
+                        </div>
+                    </div>
+                </div>
+            <hr>
+            <div id = "foodNutrient">
+                <div><h3>영양정보</h3></div>
+                <div id="chart">
+                <canvas id="chart-area" class="chartjs-render-monitor"></canvas>
+                </div>
+                
+                <div id="detail">
+                    <div><span class="nutr">일일제공량</span> <span id="supportPereat" v-html="food.supportpereat" ></span></div>
+                    <hr><div><span class="nutr">칼로리</span> <span id="calory" v-html="food.calory"></span></div>
+                    <hr><div><span class="nutr">탄수화물</span> <span id="carbo" v-html="food.carbo"></span></div>
+                    <hr><div><span class="nutr">단백질</span> <span id="protein" v-html="food.protein"></span></div>
+                    <hr><div><span class="nutr">지방</span> <span id="fat" v-html="food.fat"></span></div>
+                    <hr><div><span class="nutr">당류</span> <span id="sugar" v-html="food.sugar"></span></div>
+                    <hr><div><span class="nutr">나트륨</span> <span id="natrium" v-html="food.natrium"></span></div>
+                    <hr><div><span class="nutr">콜레스테롤</span> <span id="chole" v-html="food.chole"></span></div>
+                    <hr><div><span class="nutr">포화지방산</span> <span id="fattyAcid" v-html="food.fattyacid"></span></div>
+                    <hr><div><span class="nutr">트랜스지방</span> <span id="transFat" v-html="food.transfat"></span></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="emptySection"></div>
+        <footer class="navbar-inverse">
+            <h3>Find Us</h3>
+            <ul class="nav">
+                <li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+                <li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+                <li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+            </ul>
+        </footer>
+    </div>
+	
+
+    <script>	
+
+        var Request = function() {  
+            this.getParameter = function(name) {  
+                var rtnval = '';  
+                var nowAddress = unescape(location.href);  
+                var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,  
+                        nowAddress.length)).split('&');  
+                for (var i = 0; i < parameters.length; i++) {  
+                    var varName = parameters[i].split('=')[0];  
+                    if (varName.toUpperCase() == name.toUpperCase()) {  
+                        rtnval = parameters[i].split('=')[1];  
+                        break;  
+                    }  
+                }  
+                return rtnval;  
+            }  
+        }  
+        var request = new Request();
+        //var paramValue = request.getParameter('parameter_name');  
+
+         var getConfig = function(calory, carbo, protein, fat, sugar, natrium, chole, fattyacid, transfat){
+             var config = {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [
+                            parseFloat(calory),
+                            parseFloat(carbo),
+                            parseFloat(protein),
+                            parseFloat(fat),
+                            parseFloat(sugar),
+                            parseFloat(natrium),
+                            parseFloat(chole),
+                            parseFloat(fattyacid),
+                            parseFloat(transfat)
+                        ],
+                        backgroundColor: ['#FF9AA2','#FFDAC1','#53BBF4','#E2F0CB','#B5EAD7','#FFB7B2','#C7CEEA','#B1EB00','#FFDAC1'],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        '칼로리',
+                        '탄수화물',
+                        '단백질',
+                        '지방',
+                        '당류',
+                        '나트륨',
+                        '콜레스테롤',
+                        '포화지방산',
+                        '트랜스지방'
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Chart.js Doughnut Chart'
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            };
+            return config;
+        }  
+        
+
+
+        new Vue({
+            el:'#app',
+            data (){
+                return{
+                    loginOK : '',
+                    mgr : false,
+                    food : [],
+                    fcode : '',
+                    tempID : '',
+                    ctx : '',
+                    quantity : '',
+                    aflag : true,
+                    noneallergyfoods : [],
+                    nflag : true,
+                    serverURL : "http://08416c4a.ngrok.io"
+                }
+            },
+            methods: {
+                logout : function(){
+                    localStorage.removeItem('sessionInfo');
+                    this.loginOK = '';
+                    this.mgr = false;
+                    location.href="./index.html"
+                },
+                addFood : function(fcode){
+                    if(this.quantity == ''){ alert("check Quantity"); return;}
+                    if(this.quantity < 1) {alert("check Quantity"); return;}
+
+                    if(this.food.allergyList != ''){
+                        //modal
+                        this.nflag = true;
+                        $("#myModal").modal();
+                    }
+                    else{
+                        axios.post(this.serverURL + '/ssafyvue/api/insertIntakeInfo', {
+                            id : this.loginOK,
+                            fno : fcode,
+                            quantity : this.quantity
+                        }).then(function(response){
+                            if(response.data.state=='succ'){
+                                alert('addFood Success');
+                                //location.href="./index.html";
+                            }
+                            else{
+                                alert('addFood fail');
+                            }
+                        })
+                    }
+                },
+                addFood2 : function(fcode){
+                    if(this.quantity == ''){ alert("check Quantity"); return;}
+
+                        axios.post(this.serverURL + '/ssafyvue/api/insertIntakeInfo', {
+                            id : this.loginOK,
+                            fno : fcode,
+                            quantity : this.quantity
+                        }).then(function(response){
+                            if(response.data.state=='succ'){
+                                alert('addFood Success');
+                                //location.href="./index.html";
+                            }
+                            else{
+                                alert('addFood fail');
+                            }
+                        })
+                },
+                getNoneAllergy : function(){
+                    this.nflag= false;
+                    axios
+                        .get(this.serverURL + '/ssafyvue/api/getSafeFood/' + this.loginOK)
+                        .then(response => (this.noneallergyfoods = response.data))
+                }
+            },
+            mounted(){
+                if(localStorage.getItem('sessionInfo') != null){
+                    this.loginOK = localStorage.getItem('sessionInfo');
+                }
+
+                this.fcode = request.getParameter('code');
+                
+                if(this.loginOK == '') this.tempID = -1;
+                else this.tempID = this.loginOK;
+
+                axios
+                    .get(this.serverURL + '/ssafyvue/api/getFood/' + this.fcode + '/' + this.tempID)
+                    .then(response => (this.food = response.data,
+                                        
+                                        this.ctx = document.getElementById('chart-area').getContext('2d'),
+                                        window.myDoughnut = new Chart(this.ctx, getConfig(this.food.calory,
+                                                              this.food.carbo,
+                                                              this.food.protein,
+                                                              this.food.fat,
+                                                              this.food.sugar,
+                                                              this.food.natrium,
+                                                              this.food.chole,
+                                                              this.food.fattyacid,
+                                                              this.food.transfat))
+                                        ))
+            }
+        });			
+	</script>
+</body>
+</html>
+	

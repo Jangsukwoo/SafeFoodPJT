@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<link href="./css/mypage.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+</head>
+<body>
+	<div id="app">
+		<!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+		</header>
+		
+        <!-- body -->
+        <div id=myPageBox>
+            <h3>My Page</h3> <br>
+            <form action="" method="post" @submit.prevent="modifyMember">
+                <ul>
+                    <div class="form-group">
+                        <li>
+                            <label>ID : </label>
+                            <span class="text" v-html="member.id"></span>
+                        </li>
+                    </div>
+                    <div class="form-group">
+                        <li>
+                            <label>Password</label>
+                            <input type="password" v-model="pw" class="form-control">
+                        </li>
+                        <li>
+                            <label>Password Check</label>
+                            <input type="password" v-model="pw2" class="form-control">
+                        </li>
+                    </div>
+                    <div class="form-group">
+                        <li>
+                            <label>name : </label>
+                            <span class="text" v-html="member.mname"></span>
+                        </li>
+                    </div>
+                    <div class="form-group">
+                        <li>
+                            <label>phone</label>                        
+                            <input type="text" v-model="phone" class="form-control">
+                        </li>
+                    </div>
+                    <div class="form-group">
+                        <li>
+                            <label>age : </label>
+                            <span class="text" v-html="member.mage"></span>
+                        </li>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Allergy</label>
+                        <div class="col-sm-10">
+                            <label class="checkbox-inline">대두</label> <input type="checkbox" value="대두" v-model="checkedAllergy">
+                            <label class="checkbox-inline">땅콩</label> <input type="checkbox" value="땅콩" v-model="checkedAllergy">
+                            <label class="checkbox-inline">우유</label> <input type="checkbox" value="우유" v-model="checkedAllergy">
+                            <label class="checkbox-inline">게</label> <input type="checkbox" value="게" v-model="checkedAllergy">
+                            <label class="checkbox-inline">새우</label> <input type="checkbox" value="새우" v-model="checkedAllergy">
+                            <label class="checkbox-inline">참치</label> <input type="checkbox" value="참치" v-model="checkedAllergy">
+                            <label class="checkbox-inline">연어</label> <input type="checkbox" value="연어" v-model="checkedAllergy">
+                            <label class="checkbox-inline">쑥</label> <input type="checkbox" value="쑥" v-model="checkedAllergy">
+                            <label class="checkbox-inline">소고기</label> <input type="checkbox" value="소고기" v-model="checkedAllergy">
+                            <label class="checkbox-inline">닭고기</label> <input type="checkbox" value="닭고기" v-model="checkedAllergy">
+                            <label class="checkbox-inline">돼지고기</label> <input type="checkbox" value="돼지고기" v-model="checkedAllergy">
+                            <label class="checkbox-inline">복숭아</label> <input type="checkbox" value="복숭아" v-model="checkedAllergy">
+                            <label class="checkbox-inline">민들레</label> <input type="checkbox" value="민들레" v-model="checkedAllergy">
+                            <label class="checkbox-inline">계란흰자</label> <input type="checkbox" value="계란흰자" v-model="checkedAllergy">
+                        </div>
+                    </div>
+                </ul>
+                <div id="submitBT" class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-success">Modify</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+		<footer class="navbar-inverse">
+			<h3>Find Us</h3>
+			<ul class="nav">
+				<li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+				<li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+				<li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+			</ul>
+		</footer>
+	</div>
+
+
+
+	<!-- vue -->
+	<script>
+	new Vue({
+		el:'#app',
+		data (){
+			return{
+                loginOK : '',
+                member : [],
+				mgr : false,
+                id : '',
+                pw : '',
+                pw2 : '',
+                name : '',
+                phone : '',
+                age : '',
+                checkedAllergy : [],
+                serverURL : "http://08416c4a.ngrok.io"
+			}
+		},
+		methods: {
+			logout : function(){
+	               localStorage.removeItem('sessionInfo');
+	               this.loginOK = '';
+	               this.mgr = false;
+	               location.href="./index.html"
+            },
+            modifyMember : function(){
+                if(this.pw == '') { alert('Please check your PW'); return; }
+                if(this.pw2 == '') { alert('Please check your PW2'); return; }
+                if(this.phone == '') { alert('Please check your phone'); return; }
+                if(this.pw != this.pw2) { alert('Please check your PW ans PW2 is equal'); return;}
+                
+                console.log(this.checkedAllergy);
+
+                axios.post(this.serverURL + '/ssafyvue/api/updateMember', {
+                    mname : this.name,
+                    mage : this.age,
+                    mphone : this.phone,
+                    id : this.id,
+                    pw : this.pw,
+                    allergylist : this.checkedAllergy
+
+                }).then(function(response){
+                    if(response.data.state=='succ'){
+                        alert('Modify Success');
+                        location.href="./index.html";
+                    }
+                    else{
+                        alert('Modify fail');
+                    }
+                })
+            }
+		},
+		mounted(){
+			if(localStorage.getItem('sessionInfo') != null){
+                this.loginOK = localStorage.getItem('sessionInfo');
+            }
+
+            axios
+                .get(this.serverURL + '/ssafyvue/api/getMember/'+this.loginOK)
+                .then(response => (this.member = response.data,
+                                    this.id = this.member.id,
+                                    this.pw = this.member.pw,
+                                    this.pw2 = this.member.pw,
+                                    this.name = this.member.mname,
+                                    this.phone = this.member.mphone,
+                                    this.age = this.member.age))   
+		}
+	});
+	</script>
+</body>
+</html>

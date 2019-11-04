@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+#signupBox{
+    width : 450px;
+    position: relative;
+    left: 40%;
+    top: 100px;
+}
+
+#signupBT{
+    position: relative;
+    left : 110px;
+}
+
+.ckidpw{
+    color : blue;
+    margin-bottom: 15px;
+    position: relative;
+    left: 90px;
+}
+
+.ckidpw2{
+    color : red;
+    margin-bottom: 15px;
+    position: relative;
+    left: 90px;
+}

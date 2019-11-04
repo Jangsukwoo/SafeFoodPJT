@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+	/* hr { margin: 5px; padding: 0;}
+	.foodImage { float: left; width: 25%; }
+	.foodInfo{ float: right; width: 75%; text-align: left; min-width : 500px;}
+	.title { width: 80px; display: inline-block;}
+	.nutr{width : 100px; display : inline-block;}
+	#foodSection{ margin-bottom: 30px;min-width : 800px;}
+	#foodImage { width: 200px; height: 200px; float: left; }
+	#foodMaterial { display: inline-block; width: 80%;}
+	#foodNutrient { height : 500px;}
+	#chart{width:40%; float:left; min-width:200px;}
+	#detail{width:60%; float:right;}
+    .emptySection{height : 300px;} */
+    
+
+.foodInfo{
+    margin-top : 50px;
+}
+
+#chart{
+    width: 700px;
+    float: left;
+    padding-right: 40px;
+}
+#detail{
+    margin-top : 100px;
+}
+#foodMaterial { display: inline-block; }
+.nutr{width : 100px; display : inline-block;}
+.title { width: 80px; display: inline-block;}
+.title2 {float: left; width: 200px; display: inline-block;}
+
+#allergy{
+    color : red;
+}

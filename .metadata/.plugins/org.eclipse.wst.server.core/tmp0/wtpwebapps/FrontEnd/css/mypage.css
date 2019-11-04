@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+ul{
+    padding-left: 20px;
+}
+
+#myPageBox{
+    width : 500px;
+    position: relative;
+    left: 40%;
+    top: 100px;
+}
+
+#myPageBox li {
+    padding-top: 10px;
+    padding-bottom : 10px;
+    list-style: none;
+    border-bottom : 1px solid gray;
+}
+
+#submitBT{
+    position: relative;
+    top : 10px;
+    left : 110px;
+}
+
+.text{
+    font-size: 20px;
+    font-weight: bold;
+    padding-left: 10px;
+}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<link href="./css/notice.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+</head>
+<body>
+	<div id="app">
+		<!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+        </header>
+
+        <!-- body -->
+        <div class="container">
+            <div><h2>Notice</h2>  <button v-if="mgr==true">Add Notice</button></div>
+            <table class="table table-hover">
+                <tr>
+                    <th>num</th>
+                    <th>title</th>
+                    <th>date</th>
+                    <th>writer</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+            </table>
+
+            <nav>
+                <ul class="pagination">
+                    <li>
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                    </li>
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+    
+        
+
+		<footer class="navbar-inverse">
+			<h3>Find Us</h3>
+			<ul class="nav">
+				<li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+				<li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+				<li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+			</ul>
+		</footer>
+		</div>
+	</div>
+
+
+
+	<!-- vue -->
+	<script>
+	new Vue({
+		el:'#app',
+		data (){
+			return{
+				loginOK : '',
+				mgr : false,
+				serverURL : "http://08416c4a.ngrok.io"
+			}
+		},
+		methods: {
+			logout : function(){
+                localStorage.removeItem('sessionInfo');
+                this.loginOK = '';
+                this.mgr = false;
+                location.href="./index.html"
+            }
+		},
+		mounted(){
+			if(localStorage.getItem('sessionInfo') != null){
+                this.loginOK = localStorage.getItem('sessionInfo');
+            }
+		}
+	});
+	</script>
+</body>
+</html>

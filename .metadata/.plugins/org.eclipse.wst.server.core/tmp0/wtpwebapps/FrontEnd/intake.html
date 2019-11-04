@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="./css/bootstrap.css" rel="stylesheet">
+<link href="./css/headerFooter.css" rel="stylesheet">
+<link href="./css/intake.css" rel="stylesheet">
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+<body>
+	<div id="app">
+		<!-- header -->
+		<header class="navbar-inverse">
+			<div class="nav navbar">
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">SafeFood</a></li>
+					<li><a href="notice.html">공지 사항</a></li>
+					<li><a href="foodList.html">상품 정보</a></li>
+					<li><a href="bestFood.html">베스트 섭취 정보</a></li>
+					<li><a href="QnAList.html">QnA</a></li>
+					<li v-if="loginOK != '' "><a href="intake.html">내 섭취 정보</a></li>
+					<li v-if="loginOK != '' "><a href="#">예상 섭취 정보</a></li>
+				</ul>
+				<span class="navBT">
+					<button  v-if="loginOK != '' " @click="logout" class="btn btn-danger btn-sm">Logout</button> 
+					<a href="login.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Log in" /></a>
+					<a href="mypage.html" v-if="loginOK != '' "><input type="button" class="btn btn-primary btn-sm" value="회원 정보" /></a>
+					<a href="signup.html" v-else>				  <input type="button" class="btn btn-primary btn-sm" value="Sign up" /></a>				
+				</span>
+			</div>
+		</header>
+		
+        <!-- body -->
+        <div class="container">
+            <h3 id="title">내가 섭취한 음식</h3>
+            <h2>주간 섭취 칼로리</h2>
+            <div id="lineChart">
+                <canvas id="chart-area"  ></canvas>
+                <div class="fbt"><button class="btn btn-primary" @click="getInfo">more Info</button></div>
+                <div v-if="infoflag == true">
+                    <div class="cinfo" v-if="calflag">
+                        <h2>오늘 <span class="mcal" v-html="divCal"></span> 칼로리 초과했어요..!</h2>
+                        <table class="table table-hover">
+                            <tr>
+                                <th>운동</th>
+                                <th>분</th>
+                            </tr>
+                            <tr>
+                                <td>자전거타기</td>
+                                <td v-html="h1"></td>
+                            </tr>
+                            <tr>
+                                <td>계단오르내리기</td>
+                                <td v-html="h2"></td>
+                            </tr>
+                            <tr>
+                                <td>줄넘기</td>
+                                <td v-html="h3"></td>
+                            </tr>
+                            <tr>
+                                <td>만원전철타기</td>
+                                <td v-html="h4"></td>
+                            </tr>
+                            <tr>
+                                <td>등산</td>
+                                <td v-html="h5"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="cinfo" v-else><h2>!!!아직 <span class="lcal" v-html="divCal"></span>칼로리 더 먹을수 있습니다!!!</h2></div>
+                </div>
+            </div>
+            <div id="intake">
+                <h2>일일 섭취영양소 정보</h2>
+                <div id="date"><input type="date" v-model="date" @change="getNutition"></div>
+                <div id="barChart">
+                <canvas id="chart-area2"  ></canvas>
+                
+                <div class="listbt" v-if="btflag" @click="getIntakeList"><button class="btn btn-success">show intake food list</button></div>
+                <div class="ilist" v-if="showflag == true">
+                    
+                    <table class="table table-hover">
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Total Calory</th>
+                        </tr>
+                        <tr v-for="intakefood in intakefoods">
+                            <td><img v-bind:src="intakefood.imagePath" class="listimg"></img></td>
+                            <td v-html="intakefood.fname"></td>
+                            <td v-html="intakefood.intakequantity"></td>
+                            <td v-html="intakefood.calory"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+
+		
+		
+		<div class="emptySection">
+		<footer class="navbar-inverse">
+			<h3>Find Us</h3>
+			<ul class="nav">
+				<li><span class="glyphicon glyphicon-map-marker"></span> (SSAFY) 서울시 강남구 테헤란로 멀티스퀘어</li>
+				<li><span class="glyphicon glyphicon-earphone"></span> 1234-5678</li>
+				<li><span class="glyphicon glyphicon-envelope"></span> admin@ssafy.com</li>
+			</ul>
+		</footer>
+		</div>
+	</div>
+
+	<!-- vue -->
+	<script>
+        var getConfig = function(intake){
+            var config = {
+                type: 'line',
+                data: {
+                    labels: [intake.sunday + " (일)", intake.monday + " (월)", intake.tuesday+ " (화)", intake.wednesday+ " (수)", intake.thursday+ " (목)", intake.friday+ " (금)", intake.saturday+ " (토)"],
+                    datasets: [{
+                        label: 'calory for a week',
+                        data: [intake.sundaycalory, intake.mondaycalory, intake.tuesdaycalory, intake.wednesdaycalory, intake.thursdaycalory, intake.fridaycalory, intake.saturdaycalory],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    },{
+                        label : 'woman day calory',
+                        data : [2000, 2000, 2000, 2000, 2000, 2000, 2000],
+                        type: 'line',
+                        borderColor: 'red',
+                        backgroundColor: 'rgba(255, 159, 64, 0)',
+                        borderWidth: 1
+                    },{
+                        label : 'man day calory',
+                        data : [2500, 2500, 2500, 2500, 2500, 2500, 2500],
+                        type: 'line',
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(255, 159, 64, 0)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            }
+            return config;
+        }
+
+        var getConfig2 = function(calory, carbo, protein, fat, sugar, natrium, chole, fattyacid, transfat){
+            var config = {
+                type: 'bar',
+                data: {
+                    labels: ['칼로리', '탄수화물', '단백질', '지방', '당류', '나트륨', '콜레스테롤','포화지방산','트랜스지방'],
+                    datasets: [{
+                        label: [''],
+                        data: [
+                            parseFloat(calory),
+                            parseFloat(carbo),
+                            parseFloat(protein),
+                            parseFloat(fat),
+                            parseFloat(sugar),
+                            parseFloat(natrium),
+                            parseFloat(chole),
+                            parseFloat(fattyacid),
+                            parseFloat(transfat)
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            }
+            return config;
+        }
+
+
+		var v1 = new Vue({
+			el:'#app',
+			data (){
+				return{
+					loginOK : '',
+                    mgr : false,
+                    ctx : '',
+                    date : '',
+                    ctx2 : '',
+                    food : [],
+                    intake : [],
+                    divCal : '',
+                    calflag : '',
+                    btflag : '',
+                    showflag : '',
+                    listflag : '',
+                    intakefoods : [],
+                    infoflag : '',
+                    Cal : '',
+                    h1 : '',
+                    h2 : '',
+                    h3 : '',
+                    h4 : '',
+                    h5 : '',
+                    serverURL : "http://08416c4a.ngrok.io"
+				}
+			},
+			methods: {
+				logout : function(){
+		               localStorage.removeItem('sessionInfo');
+		               this.loginOK = '';
+		               this.mgr = false;
+		               location.href="./index.html"
+                },
+                getNutition : function(){
+                    this.btflag = true;
+
+                    axios.post(this.serverURL + '/ssafyvue/api/getIntakeData', {
+                        id : this.loginOK,
+                        date : this.date
+                    }).then(
+                        function(response){
+	                        this.food = response.data;
+	                        this.ctx2 = document.getElementById('chart-area2').getContext('2d');
+	                        window.myChart = new Chart(this.ctx2, getConfig2(
+	                            this.food.calory / 10,
+	                            this.food.carbo,
+	                            this.food.protein,
+	                            this.food.fat,
+	                            this.food.sugar,
+	                            this.food.natrium / 100,
+	                            this.food.chole,
+	                            this.food.fattyacid,
+	                            this.food.transfat
+	                        ));
+                        
+                    })
+                },
+                getIntakeList : function(){
+                    this.showflag = true;
+                    axios.post(this.serverURL + '/ssafyvue/api/getIntakeData', {
+                        id : this.loginOK,
+                        date : this.date
+                    }).then(response => (this.intakefoods = response.data.intakefood))
+                },
+                getInfo : function(){
+                    this.infoflag = true;
+                    this.h1 = this.Cal / 1.53;
+                    this.h2 = this.Cal / 2.35;
+                    this.h3 = this.Cal / 3.73;
+                    this.h4 = this.Cal / 0.883;
+                    this.h5 = this.Cal / 3.26; 
+                    console.log("aa" + this.Cal)
+                    if(this.Cal > 2500){
+                            this.divCal = this.Cal - 2500;
+                            this.calflag = true;
+                            console.log(this.divCal)
+                        }
+                    else{
+                        this.divCal = 2500 - this.Cal;
+                        this.calflag = false;
+                    }
+                    
+                }
+			},
+			mounted(){
+				if(localStorage.getItem('sessionInfo') != null){
+	                this.loginOK = localStorage.getItem('sessionInfo');
+                }
+
+                axios
+					.get(this.serverURL + '/ssafyvue/api/getIntakeWeekData/'+this.loginOK)
+					.then(
+                        function(response){
+                        this.intake = response.data;
+                        console.log(this.intake);
+                        this.ctx = document.getElementById('chart-area').getContext('2d');
+                        window.myChart = new Chart(this.ctx, getConfig(this.intake));
+                    })
+
+                axios
+					.get(this.serverURL + '/ssafyvue/api/getIntakeWeekData/'+this.loginOK)
+                    .then(response => (this.Cal = response.data.todaycalory))
+
+                    
+			}
+		});
+	</script>
+</body>
+</html>

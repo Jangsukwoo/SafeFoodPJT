@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 7 elements from project &apos;vueboot2&apos;&#x0A;- Original project: &apos;vueboot2&apos;&#x0A;- Original elements:&#x0A;     log-2019-05-01.log&#x0A;     log-2019-05-07.log&#x0A;     log-2019-05-08.log&#x0A;     log-2019-05-09.log&#x0A;     log-2019-05-13.log&#x0A;     log-2019-05-14.log&#x0A;     log-2019-05-15.log" description="Delete elements" element1="log-2019-05-07.log" element2="log-2019-05-09.log" element3="log-2019-05-08.log" element4="log-2019-05-01.log" element5="log-2019-05-14.log" element6="log-2019-05-13.log" element7="log-2019-05-15.log" elements="0" flags="589830" id="org.eclipse.jdt.ui.delete" resources="7" stamp="1566890166580" subPackages="false" version="1.0"/>
+</session>

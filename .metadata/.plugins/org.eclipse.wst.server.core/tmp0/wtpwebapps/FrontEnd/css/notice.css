@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+.container{
+    width : 1000px;
+}
+
+.container h2{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+nav{
+    position: relative;
+    left : 30%;
+    margin-top: 40px;
+}

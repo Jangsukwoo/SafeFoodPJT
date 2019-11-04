@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member"> 
+	<select id="login" parameterType="com.ssafy.edu.vue.dto.MemberDto" resultType="String">
+		select id from user where id = #{id} and pw = #{pw}
+	</select>
+		
+		
+		
+	<insert id="signup" parameterType="com.ssafy.edu.vue.dto.MemberDto">
+		insert into user (mname, mage, mphone, mgr, id, pw) values(#{mname}, #{mage}, #{mphone}, 0, #{id}, #{pw})
+	</insert>
+	
+	
+	<select id="getmember" parameterType="String" resultType="com.ssafy.edu.vue.dto.MemberDto">
+		select mname,mage,mphone,mgr,id,pw from user where id=#{id}
+	</select>
+	
+	
+	<update id="update" parameterType="com.ssafy.edu.vue.dto.MemberDto">
+	update user set mphone = #{mphone}, pw = #{pw} where id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+	delete from user where id=#{id}
+	</delete>
+	
+	
+ 	<select id="checkID" parameterType="String" resultType="String">
+		select id from user where id = #{id}
+	</select>
+	
+	<select id="findpassword" parameterType="com.ssafy.edu.vue.dto.MemberDto" resultType="String">
+		select pw from user where id = #{id} and mname=#{mname} and mphone=#{mphone}
+	</select>
+	
+	<select id="getRno" parameterType="String" resultType="String">
+		select rno from raw where rname like CONCAT('%',#{rname},'%') 
+	</select>
+	
+	<insert id = "addtmpallergy" parameterType="String">
+		insert into TMPMemberAllergyInfo (id,rno) values(#{id}, #{tmp});
+	</insert>
+	<insert id ="addallergy">
+		insert into MemberAllergyInfo(id,rno) select distinct id,rno from TMPMemberAllergyInfo;	
+	</insert>
+	<delete id="deletetmpallergy">
+		delete from TMPMemberAllergyInfo	
+	</delete>
+	<delete id="deleteAllergy" parameterType="String">
+		delete from MemberAllergyInfo where id=#{id}
+	</delete>
+</mapper>
